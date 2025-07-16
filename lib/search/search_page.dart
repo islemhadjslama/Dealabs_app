@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newapp/search/widgets/popular_search_section.dart';
+import 'package:newapp/search/widgets/recommended_section.dart';
 
 import '../models/product.dart';
 import '../search/widgets/nav_bar.dart';
@@ -20,7 +21,7 @@ class _SearchPageState extends State<SearchPage> {
       originalPrice: 1200000,
       discountedPrice: 900000,
       discountPercentage: 25,
-      images: ['https://via.placeholder.com/100x100.png?text=Fossil'],
+      images: ['assets/applogo.png'],
       rating: 4.8,
       reviews: 300,
       brand: 'Fossil',
@@ -39,7 +40,7 @@ class _SearchPageState extends State<SearchPage> {
       originalPrice: 22000000,
       discountedPrice: 21000000,
       discountPercentage: 5,
-      images: ['https://via.placeholder.com/100x100.png?text=iPhone+14+Pro'],
+      images: ['assets/applogo.png'],
       rating: 4.9,
       reviews: 500,
       brand: 'Apple',
@@ -58,7 +59,7 @@ class _SearchPageState extends State<SearchPage> {
       originalPrice: 3500000,
       discountedPrice: 2990000,
       discountPercentage: 15,
-      images: ['https://via.placeholder.com/100x100.png?text=Chair'],
+      images: ['assets/applogo.png'],
       rating: 4.6,
       reviews: 240,
       brand: 'Racer',
@@ -77,7 +78,7 @@ class _SearchPageState extends State<SearchPage> {
       originalPrice: 1800000,
       discountedPrice: 1600000,
       discountPercentage: 11,
-      images: ['https://via.placeholder.com/100x100.png?text=NB+Shoes'],
+      images: ['assets/applogo.png'],
       rating: 4.7,
       reviews: 450,
       brand: 'New Balance',
@@ -96,12 +97,12 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const NavBar(),
-      body:  Column(
+      body:  ListView(
           children: [
             const SizedBox(height: 20),
             PopularSearchSection(products: demoProducts),
             const SizedBox(height: 20),
-            // Add more widgets below
+            RecommendedSection(products: demoProducts),
           ],
         ),
 

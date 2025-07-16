@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../home/widgets/custom_search_bar.dart';
+import '../../search/widgets/custom_search_bar.dart';
 
 class NavBar extends StatelessWidget implements PreferredSizeWidget {
   const NavBar({super.key});

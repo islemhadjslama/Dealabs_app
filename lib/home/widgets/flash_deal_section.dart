@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:newapp/home/widgets/product_cart.dart';
+import 'package:newapp/shared/product_cart.dart';
 import '../../models/product.dart';
 import '../../product/product_detail_page.dart';
 
