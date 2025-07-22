@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class BottomNavbar extends StatefulWidget {
-  const BottomNavbar({super.key});
+class BottomNavbar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
 
-  @override
-  State<BottomNavbar> createState() => _BottomNavbarState();
-}
+  const BottomNavbar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-class _BottomNavbarState extends State<BottomNavbar> {
-  int _selectedIndex = 0;
-
-  final List<BottomNavigationBarItem> _items = const [
+  static const List<BottomNavigationBarItem> _items = [
     BottomNavigationBarItem(
       icon: Icon(Icons.home_outlined),
       label: 'Home',
@@ -29,24 +29,17 @@ class _BottomNavbarState extends State<BottomNavbar> {
     ),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // Add navigation logic here if needed
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
+      currentIndex: currentIndex,
+      onTap: onTap,
       type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.orange,
       unselectedItemColor: Colors.grey,
-      backgroundColor: Colors.white, // Explicitly set white background
+      backgroundColor: Colors.white,
       showUnselectedLabels: true,
-      elevation: 8, // Add subtle shadow
+      elevation: 8,
       items: _items,
     );
   }

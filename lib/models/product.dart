@@ -16,7 +16,7 @@ class Product {
   final bool freeShipping;
   final List<String> specifications;
   final List<String> tags;
-  final bool isFavorite;
+  bool isFavorite;
 
   Product({
     required this.id,
@@ -36,7 +36,7 @@ class Product {
     required this.freeShipping,
     required this.specifications,
     required this.tags,
-    this.isFavorite = false,
+    required this.isFavorite,
   });
 
   int get savings => originalPrice - discountedPrice;

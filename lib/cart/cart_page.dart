@@ -47,6 +47,8 @@ class _CartPageState extends State<CartPage> {
           'Rubber outsole',
         ],
         tags: ['men', 'running', '2024', 'new'],
+          isFavorite: true
+
       ),
       Product(
         id: '2',
@@ -73,6 +75,8 @@ class _CartPageState extends State<CartPage> {
           'Stretchweb outsole',
         ],
         tags: ['running', 'boost', 'adidas'],
+          isFavorite: true
+
       ),
     ];
 

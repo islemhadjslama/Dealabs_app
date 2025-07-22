@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../cart/cart_page.dart'; // Make sure this path is correct
+import '../cart/cart_page.dart'; // Make sure this path is correct
 
-class NavBar extends StatelessWidget {
-  const NavBar({super.key});
+class LogoNavBar extends StatelessWidget {
+  const LogoNavBar({super.key});
 
   @override
   Widget build(BuildContext context) {

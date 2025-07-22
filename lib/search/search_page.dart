@@ -32,6 +32,8 @@ class _SearchPageState extends State<SearchPage> {
       freeShipping: true,
       specifications: [],
       tags: ['watch', 'luxury'],
+        isFavorite: true
+
     ),
     Product(
       id: '2',
@@ -51,6 +53,8 @@ class _SearchPageState extends State<SearchPage> {
       freeShipping: true,
       specifications: [],
       tags: ['iphone', 'smartphone'],
+        isFavorite: true
+
     ),
     Product(
       id: '3',
@@ -70,6 +74,8 @@ class _SearchPageState extends State<SearchPage> {
       freeShipping: false,
       specifications: [],
       tags: ['gaming', 'chair'],
+        isFavorite: true
+
     ),
     Product(
       id: '4',
@@ -89,6 +95,8 @@ class _SearchPageState extends State<SearchPage> {
       freeShipping: true,
       specifications: [],
       tags: ['shoes', 'sport'],
+        isFavorite: true
+
     ),
   ];
 
