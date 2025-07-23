@@ -7,6 +7,8 @@ import '../wishlist/wishlist_screen.dart';
 import 'bottom_navbar.dart';
 import '../models/product.dart';
 import '../data/demo_products.dart';
+import '../data/demo_user.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -31,11 +33,13 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final List<Widget> _screens = [
       const HomeScreen(),
+      const WishlistScreen(),
       const TransactionScreen(),
-      const ProfileScreen(),
+       const ProfileScreen(),
     ];
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70), // Set your desired height
         child: const LogoNavBar(),

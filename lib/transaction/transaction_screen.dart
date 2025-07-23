@@ -1,16 +1,22 @@
-
 import 'package:flutter/material.dart';
+import 'package:newapp/transaction/widgets/order_card.dart';
+import '../models/order.dart';
+import '../data/demo_orders.dart'; // your list of demoOrders
 
-class TransactionScreen extends StatefulWidget {
+class TransactionScreen extends StatelessWidget {
   const TransactionScreen({super.key});
 
   @override
-  State<TransactionScreen> createState() => _TransactionScreenState();
-}
-
-class _TransactionScreenState extends State<TransactionScreen> {
-  @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: ListView.builder(
+        itemCount: demoOrders.length,
+        itemBuilder: (context, index) {
+          return OrderCard(order: demoOrders[index]);
+        },
+      ),
+    );
   }
 }
+
+
