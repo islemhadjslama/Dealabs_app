@@ -3,6 +3,7 @@ import 'package:newapp/wishlist/widgets/favorite_product_card.dart';
 
 import '../data/demo_products.dart';
 import '../models/product.dart';
+import '../shared/cart_manager.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -13,11 +14,12 @@ class WishlistScreen extends StatefulWidget {
 
 class _WishlistScreenState extends State<WishlistScreen> {
   late List<Product> favoriteProducts;
+  final CartManager _cartManager = CartManager(); // instance of CartManager
 
   @override
   void initState() {
     super.initState();
-    // Filter favorite products from demo data
+    // Get only favorite products
     favoriteProducts =
         demoProducts.where((product) => product.isFavorite).toList();
   }
@@ -29,16 +31,26 @@ class _WishlistScreenState extends State<WishlistScreen> {
         demoProducts[index].isFavorite = !demoProducts[index].isFavorite;
       }
 
+      // Update local list
       favoriteProducts =
-          demoProducts.where((p) => p.isFavorite).toList(); // refresh list
+          demoProducts.where((p) => p.isFavorite).toList();
     });
   }
 
-
   void addToCart(Product product) {
-    // TODO: Implement real cart logic
+    _cartManager.addToCart(product); // Use CartManager
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("${product.name} added to cart")),
+    );
+
+  }
+
+  void openProductDetails(Product product) {
+    Navigator.pushNamed(
+      context,
+      '/product',
+      arguments: product,
     );
   }
 
@@ -51,15 +63,16 @@ class _WishlistScreenState extends State<WishlistScreen> {
         itemCount: favoriteProducts.length,
         itemBuilder: (context, index) {
           final product = favoriteProducts[index];
-          return FavoriteProductCard(
-            product: product,
-            onToggleFavorite: () => toggleFavorite(product),
-            onAddToCart: () => addToCart(product),
+          return GestureDetector(
+            onTap: () => openProductDetails(product),
+            child: FavoriteProductCard(
+              product: product,
+              onToggleFavorite: () => toggleFavorite(product),
+              onAddToCart: () => addToCart(product),
+            ),
           );
         },
       ),
     );
   }
 }
-
-

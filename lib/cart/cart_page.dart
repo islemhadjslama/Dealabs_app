@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:newapp/cart/widgets/cart_bottom_bar.dart';
 import 'package:newapp/cart/widgets/cart_item_card.dart';
 import 'package:newapp/cart/widgets/cart_nav_bar.dart';
-import '../models/product.dart';
-import '../product/product_detail_page.dart';
+import 'package:provider/provider.dart';
+import '../../product/product_detail_page.dart';
+import '../checkout/checkout_screen.dart';
+import '../models/order_product.dart';
+import '../shared/cart_manager.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -13,134 +16,105 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  late List<Product> cartProducts;
-  late List<bool> isSelected;
-  late List<int> quantities;
+  late CartManager cartManager;
 
   @override
   void initState() {
     super.initState();
-
-    cartProducts = [
-      Product(
-        id: '1',
-        name: 'Nike Air Max 270',
-        description: 'Comfortable and stylish sneakers for everyday wear.',
-        originalPrice: 2200000,
-        discountedPrice: 1790000,
-        discountPercentage: 19,
-        images: [
-          'assets/products/nike1.webp',
-          'assets/products/nike2.webp',
-        ],
-        rating: 4.6,
-        reviews: 1425,
-        brand: 'Nike',
-        category: 'Shoes',
-        sellerName: 'Nike Official Store',
-        sellerLocation: 'Jakarta',
-        inStock: true,
-        freeShipping: true,
-        specifications: [
-          'Breathable mesh upper',
-          'Air Max heel unit',
-          'Rubber outsole',
-        ],
-        tags: ['men', 'running', '2024', 'new'],
-          isFavorite: true
-
-      ),
-      Product(
-        id: '2',
-        name: 'Adidas Ultraboost 21',
-        description: 'High-performance running shoes with responsive cushioning.',
-        originalPrice: 2500000,
-        discountedPrice: 1990000,
-        discountPercentage: 20,
-        images: [
-          'assets/products/adidas2.jpg',
-          'assets/products/adidas2.webp',
-        ],
-        rating: 4.8,
-        reviews: 990,
-        brand: 'Adidas',
-        category: 'Shoes',
-        sellerName: 'Adidas Store',
-        sellerLocation: 'Bandung',
-        inStock: true,
-        freeShipping: false,
-        specifications: [
-          'Primeknit+ textile upper',
-          'Boost midsole',
-          'Stretchweb outsole',
-        ],
-        tags: ['running', 'boost', 'adidas'],
-          isFavorite: true
-
-      ),
-    ];
-
-    isSelected = List.generate(cartProducts.length, (_) => false);
-    quantities = List.generate(cartProducts.length, (_) => 1);
+    cartManager = CartManager();
   }
 
   int calculateTotal() {
-    int total = 0;
-    for (int i = 0; i < cartProducts.length; i++) {
-      if (isSelected[i]) {
-        total += cartProducts[i].discountedPrice * quantities[i];
-      }
-    }
-    return total;
+    return cartManager.items
+        .where((item) => item.isSelected)
+        .fold(0, (sum, item) => sum + item.product.discountedPrice * item.quantity);
   }
 
-  bool get allSelected => isSelected.every((selected) => selected);
+  bool get allSelected =>
+      cartManager.items.isNotEmpty &&
+          cartManager.items.every((item) => item.isSelected);
 
   void toggleAll() {
     final newValue = !allSelected;
     setState(() {
-      isSelected = List.generate(cartProducts.length, (_) => newValue);
+      for (var item in cartManager.items) {
+        item.isSelected = newValue;
+      }
     });
   }
 
-  void onCheckout() {
-    final selectedItems = cartProducts
-        .asMap()
-        .entries
-        .where((entry) => isSelected[entry.key])
-        .map((entry) => entry.value)
+  void _goToCheckout(BuildContext context) {
+    final selectedItems =
+    cartManager.items.where((item) => item.isSelected).toList();
+
+    if (selectedItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select items to checkout")),
+      );
+      return;
+    }
+
+    final orderProducts = selectedItems
+        .map(
+          (item) => OrderProduct(
+        productId: item.product.id,
+        productName: item.product.name,
+        productImage: item.product.images.first,
+        quantity: item.quantity,
+        subtotal: item.product.discountedPrice * item.quantity,
+      ),
+    )
         .toList();
-    // TODO: implement checkout logic here
-    print("Proceeding to checkout with ${selectedItems.length} items");
+
+    final total = orderProducts.fold(0, (sum, p) => sum + p.subtotal);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CheckoutPage(
+          products: orderProducts,
+          totalAmount: total,
+        ),
+      ),
+    ).then((_) {
+      // Optional: Remove selected items after successful order placement
+      setState(() {
+        cartManager.items.removeWhere((item) => item.isSelected);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final cartItems = cartManager.items;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CartNavBar(),
-      body: ListView.builder(
-        itemCount: cartProducts.length,
+      body: cartItems.isEmpty
+          ? const Center(child: Text("Your cart is empty"))
+          : ListView.builder(
+        itemCount: cartItems.length,
         itemBuilder: (context, index) {
-          final product = cartProducts[index];
+          final item = cartItems[index];
           return CartItemCard(
-            product: product,
-            isSelected: isSelected[index],
-            quantity: quantities[index],
+            product: item.product,
+            isSelected: item.isSelected,
+            quantity: item.quantity,
             onToggleSelect: () {
               setState(() {
-                isSelected[index] = !isSelected[index];
+                item.isSelected = !item.isSelected;
               });
             },
             onIncrement: () {
               setState(() {
-                quantities[index]++;
+                item.quantity++;
               });
             },
             onDecrement: () {
-              if (quantities[index] > 1) {
+              if (item.quantity > 1) {
                 setState(() {
-                  quantities[index]--;
+                  item.quantity--;
                 });
               }
             },
@@ -148,20 +122,22 @@ class _CartPageState extends State<CartPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProductDetailPage(product: product),
+                  builder: (_) =>
+                      ProductDetailPage(product: item.product),
                 ),
               );
             },
           );
         },
       ),
-      bottomNavigationBar: CartBottomBar(
+      bottomNavigationBar: cartItems.isNotEmpty
+          ? CartBottomBar(
         allSelected: allSelected,
         onToggleAll: toggleAll,
         total: calculateTotal(),
-        onCheckout: onCheckout,
-      ),
+        onCheckout: () => _goToCheckout(context), // ✅ Redirect to CheckoutPage
+      )
+          : null,
     );
   }
 }
-

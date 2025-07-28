@@ -12,7 +12,7 @@ final List<Order> demoOrders = [
         productName: demoProducts[0].name,
         productImage: demoProducts[0].images[0],
         quantity: 1,
-        subtotal: demoProducts[0].discountedPrice,
+        subtotal: demoProducts[0].discountedPrice ,
       ),
       OrderProduct(
         productId: demoProducts[2].id,
