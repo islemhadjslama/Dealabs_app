@@ -1,12 +1,9 @@
-
 import 'package:flutter/material.dart';
-
-import '../../models/user.dart';
+import 'package:provider/provider.dart';
+import '../../shared/managers/user_manager.dart';
 
 class ProfileInfoForm extends StatefulWidget {
-  final User user;
-
-  const ProfileInfoForm({super.key, required this.user});
+  const ProfileInfoForm({super.key});
 
   @override
   State<ProfileInfoForm> createState() => _ProfileInfoFormState();
@@ -19,14 +16,20 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
   late TextEditingController addressController;
 
   bool isEditing = false;
+  bool initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    nameController = TextEditingController(text: widget.user.name);
-    emailController = TextEditingController(text: widget.user.email);
-    phoneController = TextEditingController(text: widget.user.phone);
-    addressController = TextEditingController(text: widget.user.address);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!initialized) {
+      final user = context.read<UserManager>().user;
+      nameController = TextEditingController(text: user.name);
+      emailController = TextEditingController(text: user.email);
+      phoneController = TextEditingController(text: user.phone);
+      addressController = TextEditingController(text: user.address);
+      initialized = true;
+    }
   }
 
   @override
@@ -38,18 +41,20 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
     super.dispose();
   }
 
-  void toggleEdit() {
-    setState(() {
-      isEditing = !isEditing;
-    });
-  }
+  void toggleEdit() => setState(() => isEditing = !isEditing);
 
   void saveChanges() {
-    // Save to DB or state management
-    toggleEdit();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile updated')),
+    final userManager = context.read<UserManager>();
+    userManager.updateUser(
+      name: nameController.text,
+      email: emailController.text,
+      phone: phoneController.text,
+      address: addressController.text,
     );
+    toggleEdit();
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Profile updated')));
   }
 
   Widget buildField(String label, TextEditingController controller) {
@@ -58,28 +63,55 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
       enabled: isEditing,
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
+        labelStyle: const TextStyle(color: Color(0xFFFF5722)),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Color(0xFFFF5722)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+          const BorderSide(color: Color(0xFFFF5722), width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        buildField('Name', nameController),
-        const SizedBox(height: 10),
-        buildField('Email', emailController),
-        const SizedBox(height: 10),
-        buildField('Phone', phoneController),
-        const SizedBox(height: 10),
-        buildField('Address', addressController),
-        const SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: isEditing ? saveChanges : toggleEdit,
-          child: Text(isEditing ? 'Save' : 'Edit'),
-        ),
-      ],
+    return Consumer<UserManager>(
+      builder: (context, userManager, _) {
+        if (!isEditing) {
+          final user = userManager.user;
+          nameController.text = user.name;
+          emailController.text = user.email;
+          phoneController.text = user.phone;
+          addressController.text = user.address;
+        }
+
+        return Column(
+          children: [
+            buildField('Name', nameController),
+            const SizedBox(height: 10),
+            buildField('Email', emailController),
+            const SizedBox(height: 10),
+            buildField('Phone', phoneController),
+            const SizedBox(height: 10),
+            buildField('Address', addressController),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF5722),
+                foregroundColor: Colors.white, // ✅ Makes "Edit" & "Save" white
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: isEditing ? saveChanges : toggleEdit,
+              child: Text(isEditing ? 'Save' : 'Edit'),
+            ),
+
+          ],
+        );
+      },
     );
   }
 }

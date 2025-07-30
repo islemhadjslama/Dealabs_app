@@ -1,62 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:newapp/wishlist/widgets/favorite_product_card.dart';
-
-import '../data/demo_products.dart';
+import 'package:provider/provider.dart';
+import '../shared/managers/product_manager.dart';
+import '../wishlist/widgets/favorite_product_card.dart';
+import '../shared/managers/cart_manager.dart';
 import '../models/product.dart';
-import '../shared/cart_manager.dart';
 
-class WishlistScreen extends StatefulWidget {
+class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
 
-  @override
-  State<WishlistScreen> createState() => _WishlistScreenState();
-}
-
-class _WishlistScreenState extends State<WishlistScreen> {
-  late List<Product> favoriteProducts;
-  final CartManager _cartManager = CartManager(); // instance of CartManager
-
-  @override
-  void initState() {
-    super.initState();
-    // Get only favorite products
-    favoriteProducts =
-        demoProducts.where((product) => product.isFavorite).toList();
-  }
-
-  void toggleFavorite(Product product) {
-    setState(() {
-      final index = demoProducts.indexWhere((p) => p.id == product.id);
-      if (index != -1) {
-        demoProducts[index].isFavorite = !demoProducts[index].isFavorite;
-      }
-
-      // Update local list
-      favoriteProducts =
-          demoProducts.where((p) => p.isFavorite).toList();
-    });
-  }
-
-  void addToCart(Product product) {
-    _cartManager.addToCart(product); // Use CartManager
+  void _addToCart(BuildContext context, Product product) {
+    Provider.of<CartManager>(context, listen: false).addToCart(product);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("${product.name} added to cart")),
-    );
-
-  }
-
-  void openProductDetails(Product product) {
-    Navigator.pushNamed(
-      context,
-      '/product',
-      arguments: product,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final productManager = Provider.of<ProductManager>(context);
+    final favoriteProducts = productManager.favoriteProducts;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       body: favoriteProducts.isEmpty
           ? const Center(child: Text("No favorite products yet"))
           : ListView.builder(
@@ -64,11 +30,18 @@ class _WishlistScreenState extends State<WishlistScreen> {
         itemBuilder: (context, index) {
           final product = favoriteProducts[index];
           return GestureDetector(
-            onTap: () => openProductDetails(product),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/product',
+                arguments: product,
+              );
+            },
             child: FavoriteProductCard(
               product: product,
-              onToggleFavorite: () => toggleFavorite(product),
-              onAddToCart: () => addToCart(product),
+              onToggleFavorite: () =>
+                  productManager.toggleFavorite(product.id),
+              onAddToCart: () => _addToCart(context, product),
             ),
           );
         },

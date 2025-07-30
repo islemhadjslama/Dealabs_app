@@ -8,7 +8,7 @@ class AdvertisingCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(13),
         child: Stack(
           alignment: Alignment.centerLeft,
           children: [

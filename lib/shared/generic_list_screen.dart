@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newapp/shared/nav_bar.dart';
-import 'package:newapp/shared/product_cart.dart';
+import 'package:newapp/shared/product_card.dart';
 import '../models/product.dart';
 import '../product/product_detail_page.dart';
 

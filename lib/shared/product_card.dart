@@ -91,7 +91,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'IDR ${product.discountedPrice}',
+                    '${product.discountedPrice} TND',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

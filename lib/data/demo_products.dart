@@ -91,7 +91,7 @@ final List<Product> demoProducts = [
     originalPrice: 300,
     discountedPrice: 249,
     discountPercentage: 17,
-    images: ['assets/image/chair.jpg'],
+    images: ['assets/products/chair.jpg'],
     rating: 4.1,
     reviews: 102,
     brand: 'ComfortZone',

@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 import '../checkout/checkout_screen.dart';
 import '../models/order_product.dart';
 import '../models/product.dart';
-import '../shared/cart_manager.dart';
-import '../shared/order_manager.dart';
+import '../shared/managers/cart_manager.dart';
+import '../shared/managers/order_manager.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final Product product;

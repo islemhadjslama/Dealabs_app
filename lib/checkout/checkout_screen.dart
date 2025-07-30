@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/order_product.dart';
-import '../shared/order_manager.dart';
-import '../data/demo_user.dart'; // your demoUser import
+import '../shared/managers/order_manager.dart';
+import '../data/demo_user.dart';
 
 class CheckoutPage extends StatefulWidget {
   final List<OrderProduct> products;
@@ -24,7 +24,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill shipping address with demoUser address
     _addressController = TextEditingController(text: demoUser.address);
   }
 
@@ -62,56 +61,83 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Order Summary",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.products.length,
-                itemBuilder: (context, index) {
-                  final p = widget.products[index];
-                  return ListTile(
-                    leading: Image.asset(p.productImage, width: 50, height: 50),
-                    title: Text(p.productName),
-                    subtitle: Text("Qty: ${p.quantity}"),
-                    trailing: Text("\$${p.subtotal}"),
-                  );
-                },
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Order Summary",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "Total: \$${widget.totalAmount}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _addressController,
-              decoration: const InputDecoration(
-                labelText: "Shipping Address",
-                border: OutlineInputBorder(),
+              const SizedBox(height: 10),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.products.length,
+                  itemBuilder: (context, index) {
+                    final p = widget.products[index];
+                    return ListTile(
+                      leading: Image.asset(p.productImage, width: 50, height: 50),
+                      title: Text(
+                        p.productName,
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                      subtitle: Text(
+                        "Qty: ${p.quantity}",
+                        style: const TextStyle(color: Colors.black54),
+                      ),
+                      trailing: Text(
+                        "${p.subtotal} TND", // ✅ Updated to TND
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-              maxLines: 2,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _placeOrder,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                minimumSize: const Size(double.infinity, 50),
+              const SizedBox(height: 20),
+              Text(
+                "Total: ${widget.totalAmount} TND", // ✅ Updated to TND
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-              child: const Text("Place Order"),
-            ),
-          ],
+              const SizedBox(height: 20),
+              TextField(
+                controller: _addressController,
+                decoration: const InputDecoration(
+                  labelText: "Shipping Address",
+                  labelStyle: TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(),
+                ),
+                style: const TextStyle(color: Colors.black),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _placeOrder,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text("Place Order"),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+

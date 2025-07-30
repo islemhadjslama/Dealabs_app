@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
-import '../../shared/product_cart.dart'; // where ProductCard is
+import '../../shared/product_card.dart'; // where ProductCard is
 import '../../product/product_detail_page.dart'; // product detail page
 
 class RecommendedSection extends StatelessWidget {

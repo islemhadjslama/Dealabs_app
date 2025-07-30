@@ -5,88 +5,68 @@ import 'package:newapp/cart/widgets/cart_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../../product/product_detail_page.dart';
 import '../checkout/checkout_screen.dart';
+import '../models/cart_item.dart';
 import '../models/order_product.dart';
-import '../shared/cart_manager.dart';
+import '../shared/managers/cart_manager.dart';
 
-class CartPage extends StatefulWidget {
+class CartPage extends StatelessWidget {
   const CartPage({super.key});
 
-  @override
-  State<CartPage> createState() => _CartPageState();
-}
-
-class _CartPageState extends State<CartPage> {
-  late CartManager cartManager;
-
-  @override
-  void initState() {
-    super.initState();
-    cartManager = CartManager();
-  }
-
-  int calculateTotal() {
-    return cartManager.items
+  int calculateTotal(List<CartItem> items) {
+    return items
         .where((item) => item.isSelected)
         .fold(0, (sum, item) => sum + item.product.discountedPrice * item.quantity);
   }
 
-  bool get allSelected =>
-      cartManager.items.isNotEmpty &&
-          cartManager.items.every((item) => item.isSelected);
-
-  void toggleAll() {
-    final newValue = !allSelected;
-    setState(() {
-      for (var item in cartManager.items) {
-        item.isSelected = newValue;
-      }
-    });
-  }
-
-  void _goToCheckout(BuildContext context) {
-    final selectedItems =
-    cartManager.items.where((item) => item.isSelected).toList();
-
-    if (selectedItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select items to checkout")),
-      );
-      return;
-    }
-
-    final orderProducts = selectedItems
-        .map(
-          (item) => OrderProduct(
-        productId: item.product.id,
-        productName: item.product.name,
-        productImage: item.product.images.first,
-        quantity: item.quantity,
-        subtotal: item.product.discountedPrice * item.quantity,
-      ),
-    )
-        .toList();
-
-    final total = orderProducts.fold(0, (sum, p) => sum + p.subtotal);
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => CheckoutPage(
-          products: orderProducts,
-          totalAmount: total,
-        ),
-      ),
-    ).then((_) {
-      // Optional: Remove selected items after successful order placement
-      setState(() {
-        cartManager.items.removeWhere((item) => item.isSelected);
-      });
-    });
-  }
+  bool allSelected(List<CartItem> items) =>
+      items.isNotEmpty && items.every((item) => item.isSelected);
 
   @override
   Widget build(BuildContext context) {
+    final cartManager = context.watch<CartManager>();
     final cartItems = cartManager.items;
+
+    void toggleAll() {
+      final newValue = !allSelected(cartItems);
+      cartManager.toggleAllSelection(newValue);
+    }
+
+    void goToCheckout() {
+      final selectedItems = cartItems.where((item) => item.isSelected).toList();
+
+      if (selectedItems.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select items to checkout")),
+        );
+        return;
+      }
+
+      final orderProducts = selectedItems
+          .map(
+            (item) => OrderProduct(
+          productId: item.product.id,
+          productName: item.product.name,
+          productImage: item.product.images.first,
+          quantity: item.quantity,
+          subtotal: item.product.discountedPrice * item.quantity,
+        ),
+      )
+          .toList();
+
+      final total = orderProducts.fold(0, (sum, p) => sum + p.subtotal);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CheckoutPage(
+            products: orderProducts,
+            totalAmount: total,
+          ),
+        ),
+      ).then((_) {
+        cartManager.removeSelectedItems();
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -101,29 +81,15 @@ class _CartPageState extends State<CartPage> {
             product: item.product,
             isSelected: item.isSelected,
             quantity: item.quantity,
-            onToggleSelect: () {
-              setState(() {
-                item.isSelected = !item.isSelected;
-              });
-            },
-            onIncrement: () {
-              setState(() {
-                item.quantity++;
-              });
-            },
-            onDecrement: () {
-              if (item.quantity > 1) {
-                setState(() {
-                  item.quantity--;
-                });
-              }
-            },
+            onToggleSelect: () => cartManager.toggleItemSelection(item.product),
+            onIncrement: () => cartManager.incrementQuantity(item.product),
+            onDecrement: () => cartManager.decrementQuantity(item.product),
+            onDelete: () => cartManager.removeProduct(item.product),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) =>
-                      ProductDetailPage(product: item.product),
+                  builder: (_) => ProductDetailPage(product: item.product),
                 ),
               );
             },
@@ -132,10 +98,10 @@ class _CartPageState extends State<CartPage> {
       ),
       bottomNavigationBar: cartItems.isNotEmpty
           ? CartBottomBar(
-        allSelected: allSelected,
+        allSelected: allSelected(cartItems),
         onToggleAll: toggleAll,
-        total: calculateTotal(),
-        onCheckout: () => _goToCheckout(context), // ✅ Redirect to CheckoutPage
+        total: calculateTotal(cartItems),
+        onCheckout: goToCheckout,
       )
           : null,
     );

@@ -1,43 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/product.dart';
+import '../../shared/managers/product_manager.dart';
 
-class ProductDetailSection extends StatefulWidget {
+class ProductDetailSection extends StatelessWidget {
   final Product product;
 
   const ProductDetailSection({super.key, required this.product});
 
   @override
-  State<ProductDetailSection> createState() => _ProductDetailSectionState();
-}
-
-class _ProductDetailSectionState extends State<ProductDetailSection> {
-  late bool isFavorite;
-
-  @override
-  void initState() {
-    super.initState();
-    isFavorite = widget.product.isFavorite;
-  }
-
-  void toggleFavorite() {
-    setState(() {
-      isFavorite = !isFavorite;
-    });
-
-    // You can add actual logic here (e.g., call API or update global state)
-    print('${widget.product.name} isFavorite: $isFavorite');
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final product = widget.product;
+    final productManager = Provider.of<ProductManager>(context);
+    final isFavorite = product.isFavorite;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title + Favorite Icon
+          // 🔹 Title + Favorite Button
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -55,18 +36,29 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
                   isFavorite ? Icons.favorite : Icons.favorite_border,
                   color: isFavorite ? Colors.red : Colors.grey,
                 ),
-                onPressed: toggleFavorite,
+                onPressed: () {
+                  productManager.toggleFavorite(product.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isFavorite
+                            ? "Removed from favorites"
+                            : "Added to favorites",
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
 
           const SizedBox(height: 8),
 
-          // Prices
+          // 🔹 Price + Discount
           Row(
             children: [
               Text(
-                "IDR ${product.discountedPrice}",
+                "\${product.discountedPrice} TND",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -76,19 +68,21 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
               const SizedBox(width: 8),
               if (product.discountPercentage > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.red[100],
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     '${product.discountPercentage}% off',
-                    style: const TextStyle(fontSize: 12, color: Colors.red),
+                    style:
+                    const TextStyle(fontSize: 12, color: Colors.redAccent),
                   ),
                 ),
               const SizedBox(width: 8),
               Text(
-                'IDR ${product.originalPrice}',
+                '\$${product.originalPrice}',
                 style: const TextStyle(
                   fontSize: 14,
                   decoration: TextDecoration.lineThrough,
@@ -100,7 +94,7 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
 
           const SizedBox(height: 12),
 
-          // Description
+          // 🔹 Description
           const Text(
             'Description',
             style: TextStyle(fontWeight: FontWeight.bold),
@@ -110,18 +104,29 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
 
           const SizedBox(height: 12),
 
-          // Specs
+          // 🔹 Specifications
           if (product.specifications.isNotEmpty) ...[
             const Text(
               'Specifications',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4),
-            ...product.specifications.map((spec) => Text('• $spec')),
+            const SizedBox(height: 6),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: product.specifications
+                  .map((spec) => Row(
+                children: [
+                  const Icon(Icons.check, size: 16, color: Colors.grey),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(spec)),
+                ],
+              ))
+                  .toList(),
+            ),
             const SizedBox(height: 12),
           ],
 
-          // Seller info
+          // 🔹 Seller Info
           Row(
             children: [
               const Icon(Icons.store, size: 16, color: Colors.grey),
@@ -132,7 +137,7 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
 
           const SizedBox(height: 8),
 
-          // Stock + Shipping
+          // 🔹 Stock & Shipping
           Row(
             children: [
               Icon(
@@ -146,7 +151,8 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
               if (product.freeShipping)
                 const Row(
                   children: [
-                    Icon(Icons.local_shipping, size: 16, color: Colors.blue),
+                    Icon(Icons.local_shipping,
+                        size: 16, color: Colors.blueAccent),
                     SizedBox(width: 4),
                     Text('Free Shipping'),
                   ],

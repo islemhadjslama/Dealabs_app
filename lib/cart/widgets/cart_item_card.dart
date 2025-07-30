@@ -8,7 +8,10 @@ class CartItemCard extends StatelessWidget {
   final VoidCallback onToggleSelect;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
-  final VoidCallback? onTap; // ✅ new optional onTap callback
+  final VoidCallback onDelete;
+
+  final VoidCallback? onTap;
+
 
   const CartItemCard({
     super.key,
@@ -18,6 +21,8 @@ class CartItemCard extends StatelessWidget {
     required this.onToggleSelect,
     required this.onIncrement,
     required this.onDecrement,
+    required this.onDelete,
+
     this.onTap,
   });
 
@@ -37,6 +42,7 @@ class CartItemCard extends StatelessWidget {
           children: [
             Checkbox(
               value: isSelected,
+              activeColor: Colors.orange, // ✅ Orange check
               onChanged: (_) => onToggleSelect(),
             ),
             Image.asset(
@@ -50,14 +56,21 @@ class CartItemCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name,
-                      maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(
+                    product.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       Text(
-                        "IDR ${product.discountedPrice}",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        "${product.discountedPrice} TND", // ✅ Updated to TND
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
                       if (product.discountPercentage > 0) ...[
                         const SizedBox(width: 8),
@@ -69,9 +82,12 @@ class CartItemCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            "${product.discountPercentage}% off",
+                            "${product.discountPercentage}% OFF",
                             style: const TextStyle(
-                                fontSize: 10, color: Colors.red),
+                              fontSize: 10,
+                              color: Colors.red,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -84,13 +100,23 @@ class CartItemCard extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: onIncrement,
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add, size: 20, color: Colors.black),
                 ),
-                Text('$quantity'),
+                Text(
+                  '$quantity',
+                  style: const TextStyle(color: Colors.black),
+                ),
                 IconButton(
                   onPressed: onDecrement,
-                  icon: const Icon(Icons.remove, size: 20),
+                  icon: const Icon(Icons.remove, size: 20, color: Colors.black),
+
                 ),
+                IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  tooltip: 'Remove from cart',
+                ),
+
               ],
             ),
           ],

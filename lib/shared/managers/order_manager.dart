@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../data/demo_products.dart';
-import '../models/order.dart';
-import '../models/order_product.dart';
+import '../../data/demo_products.dart';
+import '../../models/order.dart';
+import '../../models/order_product.dart';
 
 class OrderManager extends ChangeNotifier {
   final List<Order> _orders = [

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:newapp/shared/product_cart.dart';
+import 'package:newapp/shared/product_card.dart';
 import '../../models/product.dart';
 import '../../product/product_detail_page.dart';
+import '../../shared/generic_list_screen.dart';
 
 class FlashDealsSection extends StatefulWidget {
   final String title;
@@ -60,7 +61,12 @@ class _FlashDealsSectionState extends State<FlashDealsSection> {
   void _goToSeeAll(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const Placeholder()),
+      MaterialPageRoute(
+        builder: (_) => GenericListScreen(
+          title: widget.title,           // ✅ Pass the section title
+          products: widget.products,     // ✅ Pass ALL products
+        ),
+      ),
     );
   }
 
@@ -121,7 +127,7 @@ class _FlashDealsSectionState extends State<FlashDealsSection> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: widget.products.length,
+            itemCount: widget.products.length > 3 ? 3 : widget.products.length, // ✅ Limit to 3
             separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               final product = widget.products[index];
@@ -146,6 +152,7 @@ class _FlashDealsSectionState extends State<FlashDealsSection> {
             },
           ),
         ),
+
       ],
     );
   }

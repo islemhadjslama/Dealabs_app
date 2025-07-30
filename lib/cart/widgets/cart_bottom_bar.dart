@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class CartBottomBar extends StatelessWidget {
@@ -21,28 +20,47 @@ class CartBottomBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       height: 70,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Colors.white, // ✅ White background
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
       ),
       child: Row(
         children: [
-          Checkbox(value: allSelected, onChanged: (_) => onToggleAll()),
-          const Text("Select All"),
+          Checkbox(
+            value: allSelected,
+            onChanged: (_) => onToggleAll(),
+            activeColor: Colors.orange, // ✅ Orange check
+          ),
+          const Text(
+            "Select All",
+            style: TextStyle(color: Colors.black), // ✅ Black text
+          ),
           const Spacer(),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text("Total", style: TextStyle(fontSize: 12, color: Colors.grey)),
-              Text("IDR $total", style: const TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Total",
+                style: TextStyle(fontSize: 12, color: Colors.black54), // ✅ Dark grey
+              ),
+              Text(
+                "$total TND", // ✅ Updated to TND
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
             ],
           ),
           const SizedBox(width: 12),
           ElevatedButton(
             onPressed: onCheckout,
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange, // ✅ Orange button
+              foregroundColor: Colors.white,  // ✅ White text
+            ),
             child: const Text("Checkout"),
-          )
+          ),
         ],
       ),
     );
