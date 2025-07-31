@@ -58,7 +58,7 @@ class ProductDetailSection extends StatelessWidget {
           Row(
             children: [
               Text(
-                "\${product.discountedPrice} TND",
+             "TND ${product.discountedPrice}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
