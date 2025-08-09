@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/database/db_helper.dart';
 import 'package:newapp/shared/managers/cart_manager.dart';
 import 'package:newapp/shared/managers/order_manager.dart';
 import 'package:newapp/shared/managers/product_manager.dart';
@@ -11,14 +12,23 @@ import 'package:newapp/wishlist/wishlist_screen.dart';
 
 import 'data/demo_user.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize database
+  final dbHelper = DatabaseHelper();
+  await dbHelper.database; // This will create the database if it doesn't exist
+
+  // Optional: Print database info for debugging
+  await dbHelper.printDatabaseInfo();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartManager()),
         ChangeNotifierProvider(create: (_) => ProductManager()),
         ChangeNotifierProvider(create: (_) => UserManager(demoUser)),
-
         ChangeNotifierProvider(create: (_) => OrderManager()),
       ],
       child: const MyApp(),
