@@ -50,15 +50,25 @@ class _HomeScreenState extends State<HomeScreen> {
         _allProducts = allProducts;
 
         // Create different product lists for variety
-        _flashSaleProducts = allProducts.take(3).toList();
-        _bestDealsProducts = allProducts.reversed.take(3).toList();
-        _newArrivalsProducts =
-            allProducts.where((p) => p.isFavorite).take(3).toList();
+        // Flash Sale → top discounts
+        _flashSaleProducts = allProducts
+            .where((p) => p.discountPercentage > 0)
+            .toList()
+          ..sort((a, b) => b.discountPercentage.compareTo(a.discountPercentage));
+        _flashSaleProducts = _flashSaleProducts.take(3).toList();
 
-        // If not enough favorites, use all products
-        if (_newArrivalsProducts.length < 3) {
-          _newArrivalsProducts = allProducts.take(3).toList();
-        }
+        // Best Deals → rating + discount
+        _bestDealsProducts = allProducts
+            .where((p) => p.rating > 4.0 && p.discountPercentage > 10)
+            .toList()
+          ..sort((a, b) => b.reviews.compareTo(a.reviews));
+        _bestDealsProducts = _bestDealsProducts.take(3).toList();
+
+        // New Arrivals → latest created_at
+        _newArrivalsProducts = allProducts
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        _newArrivalsProducts = _newArrivalsProducts.take(3).toList();
 
         _isLoading = false;
       });
@@ -98,17 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: CustomSearchBar(),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
 
               // ✅ Updated CategorySlider with database products
               CategorySlider(allProducts: _allProducts),
-
-              const SizedBox(height: 12),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: AdvertisingCard(),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
               FlashDealsSection(
                 title: 'Flash Sales',
@@ -126,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 countdown: const Duration(hours: 12),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
             ],
           ),
         ),

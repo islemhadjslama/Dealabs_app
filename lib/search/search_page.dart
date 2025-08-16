@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:newapp/search/widgets/popular_search_section.dart';
 import 'package:newapp/search/widgets/recommended_section.dart';
-
+import '../data/demo_products.dart';
 import '../models/product.dart';
 import '../search/widgets/nav_bar.dart';
+import '../services/products_services.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -13,107 +14,81 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final List<Product> demoProducts = [
-    Product(
-      id: '1',
-      name: 'Fossil Watch',
-      description: 'Elegant wristwatch.',
-      originalPrice: 1200000,
-      discountedPrice: 900000,
-      discountPercentage: 25,
-      images: ['assets/applogo.png'],
-      rating: 4.8,
-      reviews: 300,
-      brand: 'Fossil',
-      category: 'Accessories',
-      sellerName: 'Fossil Store',
-      sellerLocation: 'Jakarta',
-      inStock: true,
-      freeShipping: true,
-      specifications: [],
-      tags: ['watch', 'luxury'],
-        isFavorite: true
+  final ProductsService _productsService = ProductsService();
 
-    ),
-    Product(
-      id: '2',
-      name: 'iPhone 14 Pro',
-      description: 'Latest Apple smartphone.',
-      originalPrice: 22000000,
-      discountedPrice: 21000000,
-      discountPercentage: 5,
-      images: ['assets/applogo.png'],
-      rating: 4.9,
-      reviews: 500,
-      brand: 'Apple',
-      category: 'Phones',
-      sellerName: 'Apple Store',
-      sellerLocation: 'Tunis',
-      inStock: true,
-      freeShipping: true,
-      specifications: [],
-      tags: ['iphone', 'smartphone'],
-        isFavorite: true
+  List<Product> _allProducts = [];
+  List<Product> _popularProducts = [];
+  List<Product> _recommendedProducts = [];
 
-    ),
-    Product(
-      id: '3',
-      name: 'Gaming Chair',
-      description: 'Comfortable ergonomic chair.',
-      originalPrice: 3500000,
-      discountedPrice: 2990000,
-      discountPercentage: 15,
-      images: ['assets/applogo.png'],
-      rating: 4.6,
-      reviews: 240,
-      brand: 'Racer',
-      category: 'Furniture',
-      sellerName: 'ChairZone',
-      sellerLocation: 'Sfax',
-      inStock: true,
-      freeShipping: false,
-      specifications: [],
-      tags: ['gaming', 'chair'],
-        isFavorite: true
+  bool _isLoading = true;
 
-    ),
-    Product(
-      id: '4',
-      name: 'New Balance Shoes',
-      description: 'Casual & sporty shoes.',
-      originalPrice: 1800000,
-      discountedPrice: 1600000,
-      discountPercentage: 11,
-      images: ['assets/applogo.png'],
-      rating: 4.7,
-      reviews: 450,
-      brand: 'New Balance',
-      category: 'Footwear',
-      sellerName: 'NB Store',
-      sellerLocation: 'Sousse',
-      inStock: true,
-      freeShipping: true,
-      specifications: [],
-      tags: ['shoes', 'sport'],
-        isFavorite: true
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
 
-    ),
-  ];
+  Future<void> _loadProducts() async {
+    try {
+      final allProducts = await _productsService.getAllProducts();
+
+      if (allProducts.isEmpty) {
+        _useDemoProducts();
+        return;
+      }
+
+      setState(() {
+        _allProducts = allProducts;
+
+        // Popular → products with high reviews
+        _popularProducts = allProducts
+            .where((p) => p.reviews > 50) // arbitrary threshold
+            .toList()
+          ..sort((a, b) => b.reviews.compareTo(a.reviews));
+        _popularProducts = _popularProducts.take(4).toList();
+
+        // Recommended → products with high rating
+        _recommendedProducts = allProducts
+            .where((p) => p.rating >= 4.0)
+            .toList()
+          ..sort((a, b) => b.rating.compareTo(a.rating));
+        _recommendedProducts = _recommendedProducts.toList();
+
+        _isLoading = false;
+      });
+
+      print("✅ SearchPage loaded ${allProducts.length} products from DB");
+    } catch (e) {
+      print("❌ Error loading products in SearchPage: $e");
+      _useDemoProducts();
+    }
+  }
+
+  void _useDemoProducts() {
+    setState(() {
+      _allProducts = demoProducts;
+      _popularProducts = demoProducts.take(4).toList();
+      _recommendedProducts = demoProducts.take(5).toList();
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const NavBar(),
-      body:  ListView(
-          children: [
-            const SizedBox(height: 20),
-            PopularSearchSection(products: demoProducts),
-            const SizedBox(height: 20),
-            RecommendedSection(products: demoProducts),
-          ],
-        ),
-
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+        children: [
+          const SizedBox(height: 10),
+          PopularSearchSection(products: _popularProducts),
+          const SizedBox(height: 10),
+          RecommendedSection(products: _recommendedProducts),
+        ],
+      ),
     );
   }
 }
+

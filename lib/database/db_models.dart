@@ -55,8 +55,11 @@ extension ProductDbExtension on Product {
       specifications: List<String>.from(jsonDecode(map['specifications'])),
       tags: List<String>.from(jsonDecode(map['tags'])),
       isFavorite: map['is_favorite'] == 1,
+      createdAt: DateTime.parse(map['created_at']),
+      updatedAt: DateTime.parse(map['updated_at']),
     );
   }
+
 }
 
 extension UserDbExtension on User {

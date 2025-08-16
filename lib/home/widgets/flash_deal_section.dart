@@ -146,7 +146,6 @@ class _FlashDealsSectionState extends State<FlashDealsSection> {
                       );
                     },
                   ),
-                  const SizedBox(height: 3),
                 ],
               );
             },

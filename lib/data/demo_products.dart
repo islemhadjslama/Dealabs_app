@@ -19,8 +19,9 @@ final List<Product> demoProducts = [
     freeShipping: true,
     specifications: ['4K UHD', '55 inch', 'Smart TV', 'HDMI x3', 'Wi-Fi'],
     tags: ['tv', 'electronics', 'display'],
-      isFavorite: false,
-
+    isFavorite: false,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   ),
   Product(
     id: 'p2',
@@ -40,8 +41,9 @@ final List<Product> demoProducts = [
     freeShipping: false,
     specifications: ['1L Bottle', 'Organic Certified', 'Cold Pressed'],
     tags: ['organic', 'oil', 'food'],
-      isFavorite: false,
-
+    isFavorite: false,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   ),
   Product(
     id: 'p3',
@@ -61,8 +63,9 @@ final List<Product> demoProducts = [
     freeShipping: true,
     specifications: ['Heart Rate', 'Bluetooth', 'Waterproof', 'iOS/Android'],
     tags: ['watch', 'smart', 'fitness'],
-      isFavorite: true,
-
+    isFavorite: true,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   ),
   Product(
     id: 'p4',
@@ -81,8 +84,10 @@ final List<Product> demoProducts = [
     inStock: true,
     freeShipping: true,
     specifications: ['12 Brushes', 'Synthetic Hair', 'Travel Case'],
-    tags: ['beauty', 'brush', 'makeup'], isFavorite: true,
-
+    tags: ['beauty', 'brush', 'makeup'],
+    isFavorite: true,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   ),
   Product(
     id: 'p5',
@@ -103,5 +108,8 @@ final List<Product> demoProducts = [
     specifications: ['Adjustable', 'Mesh Back', '360° Swivel'],
     tags: ['chair', 'office', 'furniture'],
     isFavorite: true,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   ),
 ];
+

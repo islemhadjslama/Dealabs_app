@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../../models/product.dart';
 import '../../product/product_detail_page.dart';
 
@@ -19,27 +21,28 @@ class PopularProductTile extends StatelessWidget {
         );
       },
       child: Container(
-        width: 100,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(12),
           color: Colors.white,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              product.images.first,
-              width: 48,
-              height: 48,
-              fit: BoxFit.contain,
+            // Image takes more space
+            Expanded(
+              child: Image.asset(
+                product.images.first,
+                width: double.infinity,
+                fit: BoxFit.contain,
+              ),
             ),
             const SizedBox(height: 8),
+            // Title takes remaining space
             Text(
               product.name,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

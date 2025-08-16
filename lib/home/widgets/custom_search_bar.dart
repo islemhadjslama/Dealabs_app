@@ -16,7 +16,6 @@ class CustomSearchBar extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         padding: const EdgeInsets.symmetric(horizontal: 12),
         width: double.infinity,
         height: 48,
