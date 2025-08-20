@@ -1,53 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:newapp/database/db_helper.dart';
-import 'package:newapp/shared/managers/cart_manager.dart';
-import 'package:newapp/shared/managers/order_manager.dart';
-import 'package:newapp/shared/managers/product_manager.dart';
-import 'package:newapp/shared/managers/user_manager.dart';
-import 'package:provider/provider.dart';
-import 'package:newapp/data/demo_products.dart';
-import 'package:newapp/home/home_screen.dart';
+import 'package:newapp/auth/auth_screen.dart';
 import 'package:newapp/shared/main_screen.dart';
-import 'package:newapp/wishlist/wishlist_screen.dart';
-
-import 'data/demo_user.dart';
+import 'package:newapp/services/auth_service.dart';
 
 void main() async {
-  // Ensure Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize database
   final dbHelper = DatabaseHelper();
-  await dbHelper.database; // This will create the database if it doesn't exist
+  await dbHelper.database; // Create DB if it doesn’t exist
+  await dbHelper.printDatabaseInfo(); // Debug info
 
-  // Optional: Print database info for debugging
-  await dbHelper.printDatabaseInfo();
+  // Check if user is already logged in using AuthService
+  final user = await AuthService().currentUser();
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => CartManager()),
-        ChangeNotifierProvider(create: (_) => ProductManager()),
-        ChangeNotifierProvider(create: (_) => UserManager(demoUser)),
-        ChangeNotifierProvider(create: (_) => OrderManager()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp(initialScreen: user == null ? const AuthScreen() : MainScreen()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget initialScreen;
+
+  const MyApp({super.key, required this.initialScreen});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Dealabs',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MainScreen(),
+      home: initialScreen,
     );
   }
 }

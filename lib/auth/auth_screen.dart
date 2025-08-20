@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:newapp/home/home_screen.dart';
+import 'package:newapp/shared/main_screen.dart';
+import '../services/auth_service.dart'; // <- Make sure this path is correct
+
 import 'widgets/app_logo.dart';
 import 'widgets/login_form.dart';
 import 'widgets/auth_button.dart';
@@ -17,23 +20,36 @@ class _AuthScreenState extends State<AuthScreen> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
-  void _handleLogin() {
-    const staticEmail = 'user@example.com';
-    const staticPassword = 'password123';
-
+  // ---- Login with AuthService ----
+  Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
 
-      if (email == staticEmail && password == staticPassword) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } else {
+      try {
+        final user = await AuthService().login(email: email, password: password);
+
+        if (user != null) {
+          // ✅ Navigate to MainScreen
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+        } else {
+          // ❌ Invalid credentials
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Invalid email or password'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        // ❌ Handle unexpected errors
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid email or password'),
+          SnackBar(
+            content: Text('Login failed: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -80,3 +96,4 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
+
