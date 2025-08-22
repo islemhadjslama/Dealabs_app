@@ -127,17 +127,18 @@ class AuthService {
 
   // ---- Current user ----
   Future<User?> currentUser() async {
-    final id = await getLoggedInUserId();
-    if (id == null) return null;
+      final id = await getLoggedInUserId();
+      if (id == null) return null;
 
-    final db = await _dbHelper.database;
-    final rows = await db.query('users', where: 'id = ?', whereArgs: [id], limit: 1);
-    if (rows.isEmpty) return null;
+      final db = await _dbHelper.database;
+      final rows = await db.query('users', where: 'id = ?', whereArgs: [id], limit: 1);
+      if (rows.isEmpty) return null;
 
-    return UserDbExtension.fromDbMap(rows.first);
-  }
+      return UserDbExtension.fromDbMap(rows.first);
+    }
 
-  // ---- Change password ----
+
+    // ---- Change password ----
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
