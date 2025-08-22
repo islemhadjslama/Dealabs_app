@@ -4,7 +4,7 @@ import '../../services/favorite_service.dart';
 import '../../services/auth_service.dart';
 import '../database/db_models.dart';
 import '../wishlist/widgets/favorite_product_card.dart';
-import '../shared/managers/cart_manager.dart';
+import '../services/cart_service.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -16,6 +16,7 @@ class WishlistScreen extends StatefulWidget {
 class _WishlistScreenState extends State<WishlistScreen> {
   final FavoriteService _favoriteService = FavoriteService();
   final AuthService _authService = AuthService();
+  final CartService _cartService = CartService();
 
   String? _userId;
   List<Product> _favoriteProducts = [];
@@ -60,14 +61,27 @@ class _WishlistScreenState extends State<WishlistScreen> {
     }
   }
 
-  void _addToCart(BuildContext context, Product product) {
-    // Replace with your CartManager or service logic
-    // For example:
-    // CartManager().addToCart(product);
+  /// Updated Add to Cart using CartService
+  Future<void> _addToCart(BuildContext context, Product product) async {
+    try {
+      await _cartService.addToCart(product);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("${product.name} added to cart")),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("${product.name} added to cart"),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to add ${product.name} to cart"),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
@@ -96,3 +110,4 @@ class _WishlistScreenState extends State<WishlistScreen> {
     );
   }
 }
+

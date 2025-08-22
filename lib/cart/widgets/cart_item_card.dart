@@ -9,9 +9,7 @@ class CartItemCard extends StatelessWidget {
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
   final VoidCallback onDelete;
-
   final VoidCallback? onTap;
-
 
   const CartItemCard({
     super.key,
@@ -22,7 +20,6 @@ class CartItemCard extends StatelessWidget {
     required this.onIncrement,
     required this.onDecrement,
     required this.onDelete,
-
     this.onTap,
   });
 
@@ -31,27 +28,41 @@ class CartItemCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
+            // ✅ Checkbox
             Checkbox(
               value: isSelected,
-              activeColor: Colors.orange, // ✅ Orange check
+              activeColor: Colors.orange,
               onChanged: (_) => onToggleSelect(),
             ),
-            Image.asset(
-              product.images.first,
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
+
+            // ✅ Product Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                product.images.first,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+              ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
+
+            // ✅ Product info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,25 +71,28 @@ class CartItemCard extends StatelessWidget {
                     product.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.black),
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Row(
                     children: [
                       Text(
-                        "${product.discountedPrice} TND", // ✅ Updated to TND
+                        "${product.discountedPrice} TND",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
                       if (product.discountPercentage > 0) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 4, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.red.shade50,
+                            color: Colors.red.shade100,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -96,27 +110,46 @@ class CartItemCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            // ✅ Quantity & delete
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton(
-                  onPressed: onIncrement,
-                  icon: const Icon(Icons.add, size: 20, color: Colors.black),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    children: [
+                      // Decrement
+                      GestureDetector(
+                        onTap: onDecrement,
+                        child: const Icon(Icons.remove, size: 18),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: Text(
+                          '$quantity',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      // Increment
+                      GestureDetector(
+                        onTap: onIncrement,
+                        child: const Icon(Icons.add, size: 18),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  '$quantity',
-                  style: const TextStyle(color: Colors.black),
+                const SizedBox(height: 6),
+                // Delete button
+                GestureDetector(
+                  onTap: onDelete,
+                  child: const Icon(Icons.delete_outline,
+                      color: Colors.red, size: 20),
                 ),
-                IconButton(
-                  onPressed: onDecrement,
-                  icon: const Icon(Icons.remove, size: 20, color: Colors.black),
-
-                ),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  tooltip: 'Remove from cart',
-                ),
-
               ],
             ),
           ],
@@ -125,3 +158,4 @@ class CartItemCard extends StatelessWidget {
     );
   }
 }
+

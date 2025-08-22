@@ -3,27 +3,41 @@ import 'package:newapp/product/widgets/add_to_cart_button.dart';
 import 'package:newapp/product/widgets/nav_bar.dart';
 import 'package:newapp/product/widgets/product_detail_section.dart';
 import 'package:newapp/product/widgets/product_image_carousel.dart';
-import 'package:provider/provider.dart';
 
 import '../checkout/checkout_screen.dart';
 import '../models/order_product.dart';
 import '../models/product.dart';
-import '../shared/managers/cart_manager.dart';
-import '../shared/managers/order_manager.dart';
+import '../services/cart_service.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final Product product;
 
   const ProductDetailPage({super.key, required this.product});
 
-  void _handleAddToCart(BuildContext context) {
-    Provider.of<CartManager>(context, listen: false).addToCart(product);
+  /// Add product to cart using CartService
+  void _handleAddToCart(BuildContext context) async {
+    try {
+      await CartService().addToCart(product);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("${product.name} added to cart")),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("${product.name} added to cart"),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to add ${product.name} to cart"),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
+  /// Checkout this product immediately without adding to cart
   void _handleCheckout(BuildContext context) {
     final products = [
       OrderProduct(
@@ -71,3 +85,4 @@ class ProductDetailPage extends StatelessWidget {
     );
   }
 }
+

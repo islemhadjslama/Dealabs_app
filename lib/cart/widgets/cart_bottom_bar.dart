@@ -20,7 +20,7 @@ class CartBottomBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       height: 70,
       decoration: const BoxDecoration(
-        color: Colors.white, // ✅ White background
+        color: Colors.white,
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
       ),
       child: Row(
@@ -28,11 +28,11 @@ class CartBottomBar extends StatelessWidget {
           Checkbox(
             value: allSelected,
             onChanged: (_) => onToggleAll(),
-            activeColor: Colors.orange, // ✅ Orange check
+            activeColor: Colors.orange,
           ),
           const Text(
             "Select All",
-            style: TextStyle(color: Colors.black), // ✅ Black text
+            style: TextStyle(color: Colors.black),
           ),
           const Spacer(),
           Column(
@@ -41,10 +41,10 @@ class CartBottomBar extends StatelessWidget {
             children: [
               const Text(
                 "Total",
-                style: TextStyle(fontSize: 12, color: Colors.black54), // ✅ Dark grey
+                style: TextStyle(fontSize: 12, color: Colors.black54),
               ),
               Text(
-                "$total TND", // ✅ Updated to TND
+                "$total TND",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -56,8 +56,8 @@ class CartBottomBar extends StatelessWidget {
           ElevatedButton(
             onPressed: onCheckout,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange, // ✅ Orange button
-              foregroundColor: Colors.white,  // ✅ White text
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
             ),
             child: const Text("Checkout"),
           ),
@@ -66,3 +66,4 @@ class CartBottomBar extends StatelessWidget {
     );
   }
 }
+
