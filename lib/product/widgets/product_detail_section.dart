@@ -3,11 +3,15 @@ import '../../models/product.dart';
 import '../../services/auth_service.dart';
 import '../../services/favorite_service.dart';
 
-
 class ProductDetailSection extends StatefulWidget {
   final Product product;
+  final VoidCallback? onFavoriteChanged; // 🔹 callback to refresh parent
 
-  const ProductDetailSection({super.key, required this.product});
+  const ProductDetailSection({
+    super.key,
+    required this.product,
+    this.onFavoriteChanged,
+  });
 
   @override
   State<ProductDetailSection> createState() => _ProductDetailSectionState();
@@ -28,7 +32,7 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
 
   Future<void> _loadFavoriteState() async {
     final user = await _authService.currentUser();
-    if (user == null) return; // no logged-in user
+    if (user == null) return;
 
     _userId = user.id;
     final fav = await _favoriteService.isFavorite(_userId!, widget.product.id);
@@ -56,6 +60,11 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
       _isFavorite = !_isFavorite;
     });
 
+    // 🔹 Notify parent to refresh
+    if (widget.onFavoriteChanged != null) {
+      widget.onFavoriteChanged!();
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -72,7 +81,7 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔹 Title + Favorite Button
+          // Title + Favorite Button
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -94,10 +103,8 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
               ),
             ],
           ),
-
           const SizedBox(height: 8),
-
-          // 🔹 Price + Discount
+          // Price + Discount
           Row(
             children: [
               Text(
@@ -132,20 +139,16 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-
-          // 🔹 Description
+          // Description
           const Text(
             'Description',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(widget.product.description),
-
           const SizedBox(height: 12),
-
-          // 🔹 Specifications
+          // Specifications
           if (widget.product.specifications.isNotEmpty) ...[
             const Text(
               'Specifications',
@@ -166,8 +169,7 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
             ),
             const SizedBox(height: 12),
           ],
-
-          // 🔹 Seller Info
+          // Seller Info
           Row(
             children: [
               const Icon(Icons.store, size: 16, color: Colors.grey),
@@ -175,10 +177,8 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
               Text('${widget.product.sellerName} • ${widget.product.sellerLocation}'),
             ],
           ),
-
           const SizedBox(height: 8),
-
-          // 🔹 Stock & Shipping
+          // Stock & Shipping
           Row(
             children: [
               Icon(
@@ -192,8 +192,7 @@ class _ProductDetailSectionState extends State<ProductDetailSection> {
               if (widget.product.freeShipping)
                 const Row(
                   children: [
-                    Icon(Icons.local_shipping,
-                        size: 16, color: Colors.blueAccent),
+                    Icon(Icons.local_shipping, size: 16, color: Colors.blueAccent),
                     SizedBox(width: 4),
                     Text('Free Shipping'),
                   ],

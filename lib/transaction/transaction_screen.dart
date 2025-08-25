@@ -1,28 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:newapp/transaction/widgets/order_card.dart';
-import 'package:provider/provider.dart';
-import '../shared/managers/order_manager.dart';
+import '../models/order.dart';
+import '../services/order_service.dart';
+import 'widgets/order_card.dart';
 
-class TransactionScreen extends StatelessWidget {
+class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final orderManager = Provider.of<OrderManager>(context); // ✅ Listen for updates
-    final orders = orderManager.orders;
+  State<TransactionScreen> createState() => _TransactionScreenState();
+}
 
+class _TransactionScreenState extends State<TransactionScreen> {
+  final _orderService = OrderService();
+  List<Order> _orders = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshOrders();
+  }
+
+  Future<void> _refreshOrders() async {
+    setState(() => _isLoading = true);
+    final orders = await _orderService.getOrders();
+    setState(() {
+      _orders = orders;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: orders.isEmpty
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _orders.isEmpty
           ? const Center(child: Text("No orders yet."))
-          : ListView.builder(
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          return OrderCard(order: orders[index]);
-        },
+          : RefreshIndicator(
+        onRefresh: _refreshOrders,
+        child: ListView.builder(
+          itemCount: _orders.length,
+          itemBuilder: (context, index) => OrderCard(order: _orders[index]),
+        ),
       ),
     );
   }
 }
-
-

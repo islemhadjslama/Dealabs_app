@@ -17,8 +17,6 @@ class ProductCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: 180,
-        // You can add a fixed height if needed
-        height: 220,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -32,6 +30,7 @@ class ProductCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // make card height fit content
           children: [
             Stack(
               children: [
@@ -43,7 +42,6 @@ class ProductCard extends StatelessWidget {
                   child: product.images.isNotEmpty
                       ? Image.asset(
                     product.images.first,
-                    height: 120,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   )
@@ -76,9 +74,10 @@ class ProductCard extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 4), // 🔽 Less bottom padding
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     product.name,
@@ -98,16 +97,16 @@ class ProductCard extends StatelessWidget {
                       color: Colors.red,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'IDR ${product.originalPrice}',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey,
-                      decoration: TextDecoration.lineThrough,
+                  if (product.discountPercentage > 0)
+                    Text(
+                      'IDR ${product.originalPrice}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4), // 🔽 reduced from 6
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       const Icon(Icons.star, size: 14, color: Colors.amber),
@@ -116,7 +115,7 @@ class ProductCard extends StatelessWidget {
                         product.rating.toStringAsFixed(1),
                         style: const TextStyle(fontSize: 12),
                       ),
-                      const SizedBox(width: 4), // 🔽 reduced
+                      const SizedBox(width: 4),
                       Text(
                         '(${product.reviews})',
                         style: const TextStyle(fontSize: 11, color: Colors.grey),

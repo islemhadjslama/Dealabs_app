@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../models/order_product.dart';
-import '../shared/managers/order_manager.dart';
-import '../data/demo_user.dart';
+import '../services/order_service.dart';
 
 class CheckoutPage extends StatefulWidget {
   final List<OrderProduct> products;
@@ -20,14 +18,16 @@ class CheckoutPage extends StatefulWidget {
 
 class _CheckoutPageState extends State<CheckoutPage> {
   late TextEditingController _addressController;
+  final OrderService _orderService = OrderService();
+  bool _isPlacingOrder = false;
 
   @override
   void initState() {
     super.initState();
-    _addressController = TextEditingController(text: demoUser.address);
+    _addressController = TextEditingController();
   }
 
-  void _placeOrder() {
+  Future<void> _placeOrder() async {
     if (_addressController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter a shipping address")),
@@ -35,21 +35,27 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return;
     }
 
-    final orderManager = Provider.of<OrderManager>(context, listen: false);
+    setState(() => _isPlacingOrder = true);
 
-    orderManager.addOrder(
-      products: widget.products,
-      totalAmount: widget.totalAmount,
-      shippingAddress: _addressController.text,
-      userId: demoUser.id,
-      paymentMethod: "Cash",
-    );
+    try {
+      await _orderService.createOrder(
+        products: widget.products,
+        totalAmount: widget.totalAmount,
+        shippingAddress: _addressController.text,
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("✅ Order placed successfully for ${demoUser.name}!")),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("✅ Order placed successfully!")),
+      );
 
-    Navigator.pop(context);
+      Navigator.pop(context, true); // Return "true" to indicate a new order
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to place order: $e")),
+      );
+    } finally {
+      setState(() => _isPlacingOrder = false);
+    }
   }
 
   @override
@@ -70,11 +76,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             children: [
               const Text(
                 "Order Summary",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Expanded(
@@ -84,54 +86,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     final p = widget.products[index];
                     return ListTile(
                       leading: Image.asset(p.productImage, width: 50, height: 50),
-                      title: Text(
-                        p.productName,
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                      subtitle: Text(
-                        "Qty: ${p.quantity}",
-                        style: const TextStyle(color: Colors.black54),
-                      ),
-                      trailing: Text(
-                        "${p.subtotal} TND", // ✅ Updated to TND
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
+                      title: Text(p.productName),
+                      subtitle: Text("Qty: ${p.quantity}"),
+                      trailing: Text("${p.subtotal} TND"),
                     );
                   },
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
-                "Total: ${widget.totalAmount} TND", // ✅ Updated to TND
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
+              Text("Total: ${widget.totalAmount} TND", style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               TextField(
                 controller: _addressController,
                 decoration: const InputDecoration(
                   labelText: "Shipping Address",
-                  labelStyle: TextStyle(color: Colors.black),
                   border: OutlineInputBorder(),
                 ),
-                style: const TextStyle(color: Colors.black),
                 maxLines: 2,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _placeOrder,
+                onPressed: _isPlacingOrder ? null : _placeOrder,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text("Place Order"),
+                child: _isPlacingOrder
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("Place Order"),
               ),
             ],
           ),
@@ -140,4 +122,3 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 }
-

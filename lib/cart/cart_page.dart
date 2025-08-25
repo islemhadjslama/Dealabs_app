@@ -63,7 +63,8 @@ class _CartPageState extends State<CartPage> {
 
     final total = orderProducts.fold(0, (sum, p) => sum + p.subtotal);
 
-    await Navigator.push(
+    // Navigate to CheckoutPage and wait for result
+    final orderPlaced = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => CheckoutPage(
@@ -73,12 +74,20 @@ class _CartPageState extends State<CartPage> {
       ),
     );
 
-    // Remove selected items after checkout
-    for (var item in selectedItems) {
-      await _cartService.removeFromCart(item.product.id);
+    // If the user placed an order, refresh the cart and optionally notify TransactionScreen
+    if (orderPlaced == true) {
+      // Remove selected items from cart
+      for (var item in selectedItems) {
+        await _cartService.removeFromCart(item.product.id);
+      }
+      _refresh();
+
+      // Optionally, if TransactionScreen is already in the widget tree, you can trigger a refresh
+      // For example, using a global key or state management solution (Provider/SetState)
     }
-    _refresh();
   }
+
+
 
   @override
   Widget build(BuildContext context) {

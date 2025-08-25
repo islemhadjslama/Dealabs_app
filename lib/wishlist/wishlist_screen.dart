@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
-import '../../services/favorite_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/favorite_service.dart';
 import '../database/db_models.dart';
 import '../wishlist/widgets/favorite_product_card.dart';
 import '../services/cart_service.dart';
@@ -20,7 +20,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   String? _userId;
   List<Product> _favoriteProducts = [];
-
   bool _isLoading = true;
 
   @override
@@ -29,14 +28,22 @@ class _WishlistScreenState extends State<WishlistScreen> {
     _loadFavorites();
   }
 
+  /// Load favorites for the current user
   Future<void> _loadFavorites() async {
+    setState(() => _isLoading = true);
+
     final user = await _authService.currentUser();
-    if (user == null) return;
+    if (user == null) {
+      setState(() => _isLoading = false);
+      return;
+    }
 
     _userId = user.id;
 
     final favoriteMaps = await _favoriteService.getFavorites(_userId!);
-    final favorites = favoriteMaps.map((map) => ProductDbExtension.fromDbMap(map)).toList();
+    final favorites = favoriteMaps
+        .map((map) => ProductDbExtension.fromDbMap(map))
+        .toList();
 
     setState(() {
       _favoriteProducts = favorites;
@@ -44,24 +51,23 @@ class _WishlistScreenState extends State<WishlistScreen> {
     });
   }
 
+  /// Toggle a product favorite status and refresh the list
   Future<void> _toggleFavorite(Product product) async {
     if (_userId == null) return;
 
     final isFav = await _favoriteService.isFavorite(_userId!, product.id);
+
     if (isFav) {
       await _favoriteService.removeFavorite(_userId!, product.id);
-      setState(() {
-        _favoriteProducts.removeWhere((p) => p.id == product.id);
-      });
     } else {
       await _favoriteService.addFavorite(_userId!, product.id);
-      setState(() {
-        _favoriteProducts.add(product);
-      });
     }
+
+    // Refresh favorites list after toggle
+    await _loadFavorites();
   }
 
-  /// Updated Add to Cart using CartService
+  /// Add product to cart with a feedback message
   Future<void> _addToCart(BuildContext context, Product product) async {
     try {
       await _cartService.addToCart(product);
@@ -73,7 +79,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           duration: const Duration(seconds: 2),
         ),
       );
-    } catch (e) {
+    } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Failed to add ${product.name} to cart"),
@@ -94,20 +100,22 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: _favoriteProducts.isEmpty
-          ? const Center(child: Text("No favorite products yet"))
-          : ListView.builder(
-        itemCount: _favoriteProducts.length,
-        itemBuilder: (context, index) {
-          final product = _favoriteProducts[index];
-          return FavoriteProductCard(
-            product: product,
-            onToggleFavorite: () => _toggleFavorite(product),
-            onAddToCart: () => _addToCart(context, product),
-          );
-        },
+      body: RefreshIndicator(
+        onRefresh: _loadFavorites, // Pull-to-refresh support
+        child: _favoriteProducts.isEmpty
+            ? const Center(child: Text("No favorite products yet"))
+            : ListView.builder(
+          itemCount: _favoriteProducts.length,
+          itemBuilder: (context, index) {
+            final product = _favoriteProducts[index];
+            return FavoriteProductCard(
+              product: product,
+              onToggleFavorite: () => _toggleFavorite(product),
+              onAddToCart: () => _addToCart(context, product),
+            );
+          },
+        ),
       ),
     );
   }
 }
-
