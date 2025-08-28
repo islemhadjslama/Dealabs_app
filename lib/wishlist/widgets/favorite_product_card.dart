@@ -27,28 +27,29 @@ class FavoriteProductCard extends StatelessWidget {
       },
       child: Card(
         color: Colors.white,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Product image
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
                   product.images.first,
-                  width: 60,
-                  height: 60,
+                  width: 55,
+                  height: 55,
                   fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(width: 10),
+
+              // Product info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       product.name,
@@ -59,11 +60,11 @@ class FavoriteProductCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       "${product.discountedPrice} TND",
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: Colors.deepOrange,
                       ),
@@ -71,8 +72,10 @@ class FavoriteProductCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+
+              // Actions (Favorite + Cart)
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     icon: Icon(
@@ -86,6 +89,7 @@ class FavoriteProductCard extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
+                  const SizedBox(width: 6),
                   IconButton(
                     icon: const Icon(Icons.shopping_cart_outlined, size: 20),
                     onPressed: onAddToCart,

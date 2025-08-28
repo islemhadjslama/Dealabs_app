@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../models/user.dart';
 import '../../services/auth_service.dart';
 
 class ProfileInfoForm extends StatefulWidget {
-  const ProfileInfoForm({super.key});
+  final User user;
+
+  const ProfileInfoForm({super.key, required this.user});
 
   @override
   State<ProfileInfoForm> createState() => _ProfileInfoFormState();
@@ -17,26 +20,14 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
   late TextEditingController addressController;
 
   bool isEditing = false;
-  bool _initialized = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_initialized) {
-      _loadUserInfo();
-      _initialized = true;
-    }
-  }
-
-  Future<void> _loadUserInfo() async {
-    final user = await _authService.currentUser();
-    if (user != null) {
-      nameController = TextEditingController(text: user.name);
-      emailController = TextEditingController(text: user.email);
-      phoneController = TextEditingController(text: user.phone);
-      addressController = TextEditingController(text: user.address);
-      setState(() {});
-    }
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.user.name);
+    emailController = TextEditingController(text: widget.user.email);
+    phoneController = TextEditingController(text: widget.user.phone);
+    addressController = TextEditingController(text: widget.user.address);
   }
 
   @override
@@ -48,11 +39,7 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
     super.dispose();
   }
 
-  void toggleEdit() async {
-    if (!isEditing) {
-      // Refresh user info when entering edit mode
-      await _loadUserInfo();
-    }
+  void toggleEdit() {
     setState(() => isEditing = !isEditing);
   }
 
@@ -64,11 +51,8 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
         phone: phoneController.text,
         address: addressController.text,
       );
+      setState(() => isEditing = false);
 
-      // Reload user info
-      await _loadUserInfo();
-
-      toggleEdit();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully')),
       );
@@ -100,10 +84,6 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_initialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return Column(
       children: [
         buildField('Name', nameController),
@@ -127,3 +107,4 @@ class _ProfileInfoFormState extends State<ProfileInfoForm> {
     );
   }
 }
+
