@@ -12,10 +12,10 @@ class AppLogo extends StatelessWidget {
         // Logo image
         Image.asset(
           './assets/applogo.png',
-          width: 150,
-          height: 150,
+          width: 200,
+          height: 200,
         ),
-        const SizedBox(height: 26),
+        const SizedBox(height: 32),
 
         // Title
         const Text(

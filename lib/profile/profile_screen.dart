@@ -3,6 +3,7 @@ import 'package:newapp/profile/widgets/profile_image_widget.dart';
 import 'package:newapp/profile/widgets/profile_info_form.dart';
 import '../../services/auth_service.dart';
 import '../../models/user.dart';
+import '../shared/welcome_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -49,18 +50,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0, // flat appbar
+        leading: null, // remove the back arrow
+        automaticallyImplyLeading: false, // also ensure no default leading
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.black),
             onPressed: () async {
               await _authService.logout();
               if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                      (route) => false,
+                );
               }
             },
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
